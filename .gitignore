@@ -2,6 +2,7 @@
 .gradle
 build/
 *.iws
+*.ipr
 
 # Ignore Gradle GUI config
 gradle-app.setting
