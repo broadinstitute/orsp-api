@@ -1,0 +1,9 @@
+### Gradle template
+.gradle
+build/
+*.iws
+
+# Ignore Gradle GUI config
+gradle-app.setting
+
+
