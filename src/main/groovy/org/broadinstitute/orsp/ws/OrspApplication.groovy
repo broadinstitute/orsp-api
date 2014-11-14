@@ -5,6 +5,7 @@ import groovy.util.logging.Slf4j
 import io.dropwizard.Application
 import io.dropwizard.setup.Bootstrap
 import io.dropwizard.setup.Environment
+import org.broadinstitute.orsp.ws.health.SampleCacheHealthCheck
 import org.broadinstitute.orsp.ws.resources.SampleCollectionResource
 
 @Slf4j
@@ -20,6 +21,9 @@ class OrspApplication extends Application<OrspApplicationConfiguration> {
     public void run(OrspApplicationConfiguration configuration,
                     Environment environment) throws ClassNotFoundException {
         log.debug('Running ... ' + name)
+
+        final SampleCacheHealthCheck healthCheck = new SampleCacheHealthCheck()
+        environment.healthChecks().register("sampleCache", healthCheck)
         environment.jersey().register(new SampleCollectionResource())
     }
 
