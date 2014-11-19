@@ -14,7 +14,7 @@ import com.sun.jersey.api.client.ClientResponse
 import groovy.json.JsonBuilder
 import org.boon.json.JsonFactory
 import org.boon.json.ObjectMapper
-import org.broadinstitute.orsp.ws.domain.SampleCollection
+import org.broadinstitute.orsp.ws.domain.Irb
 import org.junit.Test
 
 import javax.ws.rs.core.MediaType
@@ -22,25 +22,31 @@ import javax.ws.rs.core.Response
 
 import static org.junit.Assert.assertTrue
 
-class SampleCollectionResourceTest extends BaseAppResourceTest {
+/**
+ *
+ * Created: 11/19/14
+ *
+ * @author <a href="mailto:grushton@broadinstitute.org">grushton</a>
+ */
+class IrbResourceTest extends BaseAppResourceTest {
 
-    private static final String LOCAL_APPLICATION_URL = "http://localhost:%d/collection"
+    private static final String LOCAL_APPLICATION_URL = "http://localhost:%d/irb"
 
-    // SC-1103	Colombian Population Samples	Reich	Population	0
-    // SC-1100	Jackson Heart Study - Diabetes	Reich - Diabetes	Population	0
-    def sample1 = new SampleCollection(
-            id: "SC-1103",
-            name: "Colombian Population Samples",
-            category: "Reich",
-            groupName: "Population",
-            archived: "0"
+    def irb1 = new Irb(
+            id: "IRB-1",
+            summary: "Example IRB 1",
+            location: "http://broadinstitute.org/",
+            managers: ["John Smith", "Jane Doe"]
     )
-    def sample2 = new SampleCollection(
-            id: "SC-1100",
-            name: "Jackson Heart Study - Diabetes",
-            category: "Reich - Diabetes",
-            groupName: "Population",
-            archived: "0"
+
+    def irb2 = new Irb(
+            id: "IRB-2",
+            summary: "Example IRB 2",
+            location: "http://broadinstitute.org/",
+            managers: ["Sally Morgan"],
+            protocol: "XYZ-123",
+            status: "Complete",
+            sampleCollections: ["SC-1", "SC-2"]
     )
 
     @Test
@@ -48,113 +54,120 @@ class SampleCollectionResourceTest extends BaseAppResourceTest {
         Client client = getClient()
 
         ClientResponse response = client.resource(
-                String.format(LOCAL_APPLICATION_URL + "/garbagetext", RULE.getLocalPort())).
+                String.format(LOCAL_APPLICATION_URL + "/afsjkfjklfsadfsd", RULE.getLocalPort())).
                 accept(MediaType.APPLICATION_JSON).
                 type(MediaType.APPLICATION_JSON).
                 get(ClientResponse.class)
         assertTrue(response.status == Response.Status.NOT_FOUND.statusCode)
 
-        def ids = ["bad id 1", "bad id 1", "bad id 3"]
         response = client.resource(
-                String.format(LOCAL_APPLICATION_URL + "/findAll", RULE.getLocalPort())).
+                String.format(LOCAL_APPLICATION_URL + "/find/afsjkfjklfsadfsd", RULE.getLocalPort())).
                 accept(MediaType.APPLICATION_JSON).
                 type(MediaType.APPLICATION_JSON).
-                post(ClientResponse.class, new JsonBuilder(ids).toString())
+                get(ClientResponse.class)
         assertTrue(response.status == Response.Status.NOT_FOUND.statusCode)
     }
 
     @Test
     public void testPostAndGetSampleCollections() {
         Client client = getClient()
-        ObjectMapper mapper =  JsonFactory.create()
+        ObjectMapper mapper = JsonFactory.create()
 
-        // post a sample1 collection:
+        // Add
         def response = client.resource(
                 String.format(LOCAL_APPLICATION_URL, RULE.getLocalPort())).
                 accept(MediaType.APPLICATION_JSON).
                 type(MediaType.APPLICATION_JSON).
-                post(String.class, new JsonBuilder(sample1).toString())
-        SampleCollection responseSample = mapper.readValue(response, SampleCollection.class)
-        assertTrue(responseSample.equals(sample1))
+                post(String.class, new JsonBuilder(irb1).toString())
+        Irb irb = mapper.readValue(response, Irb.class)
+        assertTrue(irb.equals(irb1))
 
-        // post a sample2 collection:
         response = client.resource(
                 String.format(LOCAL_APPLICATION_URL, RULE.getLocalPort())).
                 accept(MediaType.APPLICATION_JSON).
                 type(MediaType.APPLICATION_JSON).
-                post(String.class, new JsonBuilder(sample2).toString())
-        responseSample = mapper.readValue(response, SampleCollection.class)
-        assertTrue(responseSample.equals(sample2))
+                post(String.class, new JsonBuilder(irb2).toString())
+        irb = mapper.readValue(response, Irb.class)
+        assertTrue(irb.equals(irb2))
 
-        // retrieve all sample collections and ensure that the ones we posted exists
+
+        // Find all
         response = client.resource(
                 String.format(LOCAL_APPLICATION_URL, RULE.getLocalPort())).
                 accept(MediaType.APPLICATION_JSON).
                 type(MediaType.APPLICATION_JSON).
                 get(String.class)
-        List<SampleCollection> list = mapper.readValue(
+        List<Irb> list = mapper.readValue(
                 response,
                 List.class,
-                SampleCollection.class)
-        assertTrue(list.contains(sample1))
-        assertTrue(list.contains(sample2))
+                Irb.class)
+        assertTrue(list.contains(irb1))
+        assertTrue(list.contains(irb2))
 
-        // retrieve the sample collection matching an ID
+
+        // Get by ID
         response = client.resource(
-                String.format(LOCAL_APPLICATION_URL + "/" + sample1.id, RULE.getLocalPort())).
+                String.format(LOCAL_APPLICATION_URL + "/" + irb1.id, RULE.getLocalPort())).
                 accept(MediaType.APPLICATION_JSON).
                 type(MediaType.APPLICATION_JSON).
                 get(String.class)
-        responseSample = mapper.readValue(response, SampleCollection.class)
-        assertTrue(responseSample.equals(sample1))
+        Irb responseIrb = mapper.readValue(response, Irb.class)
+        assertTrue(responseIrb.equals(irb1))
 
-        // find the sample collections matching a search term
         response = client.resource(
-                String.format(LOCAL_APPLICATION_URL + "/find/" + sample1.category, RULE.getLocalPort())).
+                String.format(LOCAL_APPLICATION_URL + "/" + irb2.id, RULE.getLocalPort())).
                 accept(MediaType.APPLICATION_JSON).
                 type(MediaType.APPLICATION_JSON).
                 get(String.class)
-        list = mapper.readValue(
-                response,
-                List.class,
-                SampleCollection.class)
-        assertTrue(list.contains(sample1))
+        responseIrb = mapper.readValue(response, Irb.class)
+        assertTrue(responseIrb.equals(irb2))
 
-        // find the sample collections matching a lower cased substring search term
+
+        // Search
         response = client.resource(
-                String.format(LOCAL_APPLICATION_URL + "/find/" + sample2.name.substring(0,5).toLowerCase(), RULE.getLocalPort())).
+                String.format(LOCAL_APPLICATION_URL + "/find/" + urlEncode(irb1.summary), RULE.getLocalPort())).
                 accept(MediaType.APPLICATION_JSON).
                 type(MediaType.APPLICATION_JSON).
                 get(String.class)
         list = mapper.readValue(
                 response,
                 List.class,
-                SampleCollection.class)
-        assertTrue(list.contains(sample2))
+                Irb.class)
+        assertTrue(list.contains(irb1))
 
-        def ids = [sample1, sample2]*.id
+        // Search a collection
         response = client.resource(
-                String.format(LOCAL_APPLICATION_URL + "/findAll", RULE.getLocalPort())).
+                String.format(LOCAL_APPLICATION_URL + "/find/" + urlEncode(irb1.managers[1]), RULE.getLocalPort())).
                 accept(MediaType.APPLICATION_JSON).
                 type(MediaType.APPLICATION_JSON).
-                post(ClientResponse.class, new JsonBuilder(ids).toString())
+                get(String.class)
         list = mapper.readValue(
-                response.getEntity(String.class),
+                response,
                 List.class,
-                SampleCollection.class)
-        assertTrue(response.status == Response.Status.OK.statusCode)
-        assertTrue(list.contains(sample1))
-        assertTrue(list.contains(sample2))
+                Irb.class)
+        assertTrue(list.contains(irb1))
 
         response = client.resource(
-                String.format(LOCAL_APPLICATION_URL + "/" + sample1.id, RULE.getLocalPort())).
+                String.format(LOCAL_APPLICATION_URL + "/find/" + urlEncode(irb2.sampleCollections[0]), RULE.getLocalPort())).
+                accept(MediaType.APPLICATION_JSON).
+                type(MediaType.APPLICATION_JSON).
+                get(String.class)
+        list = mapper.readValue(
+                response,
+                List.class,
+                Irb.class)
+        assertTrue(list.contains(irb2))
+
+        // Delete
+        response = client.resource(
+                String.format(LOCAL_APPLICATION_URL + "/" + irb1.id, RULE.getLocalPort())).
                 accept(MediaType.APPLICATION_JSON).
                 type(MediaType.APPLICATION_JSON).
                 delete(ClientResponse.class)
         assertTrue(response.status == Response.Status.OK.statusCode)
 
         response = client.resource(
-                String.format(LOCAL_APPLICATION_URL + "/" + sample2.id, RULE.getLocalPort())).
+                String.format(LOCAL_APPLICATION_URL + "/" + irb2.id, RULE.getLocalPort())).
                 accept(MediaType.APPLICATION_JSON).
                 type(MediaType.APPLICATION_JSON).
                 delete(ClientResponse.class)

@@ -1,3 +1,12 @@
+/*
+ * The Broad Institute
+ * SOFTWARE COPYRIGHT NOTICE AGREEMENT
+ * This software and its documentation are copyright 2014 by the
+ * Broad Institute/Massachusetts Institute of Technology. All rights are reserved.
+ *
+ * This software is supplied without any warranty or guaranteed support whatsoever. Neither
+ * the Broad Institute nor MIT can be responsible for its use, misuse, or functionality.
+ */
 package org.broadinstitute.orsp.ws
 
 import com.mongodb.Mongo
@@ -10,7 +19,8 @@ import javax.validation.constraints.Min
 
 class OrspApplicationConfiguration extends Configuration {
 
-    @JsonProperty @NotEmpty
+    @JsonProperty
+    @NotEmpty
     public String mongohost = "localhost";
 
     @Min(1L)
@@ -18,9 +28,9 @@ class OrspApplicationConfiguration extends Configuration {
     @JsonProperty
     public int mongoport = 27017;
 
-    @JsonProperty @NotEmpty
+    @JsonProperty
+    @NotEmpty
     public String mongodb = "orsp-api";
-
 
     public Mongo getMongo() {
         new Mongo(mongohost, mongoport)

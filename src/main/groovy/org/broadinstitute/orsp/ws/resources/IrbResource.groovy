@@ -17,7 +17,7 @@ import groovy.util.logging.Slf4j
 import io.dropwizard.jersey.caching.CacheControl
 import net.vz.mongodb.jackson.DBQuery
 import net.vz.mongodb.jackson.JacksonDBCollection
-import org.broadinstitute.orsp.ws.domain.SampleCollection
+import org.broadinstitute.orsp.ws.domain.Irb
 
 import javax.validation.Valid
 import javax.ws.rs.*
@@ -25,54 +25,60 @@ import javax.ws.rs.core.MediaType
 import java.util.concurrent.TimeUnit
 import java.util.regex.Pattern
 
-@Path('/collection')
+/**
+ *
+ * Created: 11/19/14
+ *
+ * @author <a href="mailto:grushton@broadinstitute.org">grushton</a>
+ */
+@Path('/irb')
 @Produces(MediaType.APPLICATION_JSON)
 @Slf4j
 @TypeChecked
-class SampleCollectionResource {
+class IrbResource {
 
-    private static JacksonDBCollection<SampleCollection, String> COLLECTIONS
+    private static JacksonDBCollection<Irb, String> IRBS
 
-    SampleCollectionResource(DB mongoDb) {
-        COLLECTIONS = JacksonDBCollection.wrap(
-                mongoDb.getCollection("sampleCollection"),
-                SampleCollection.class, String.class)
+    IrbResource(DB mongoDb) {
+        IRBS = JacksonDBCollection.wrap(
+                mongoDb.getCollection("irb"),
+                Irb.class, String.class)
     }
 
     @Consumes(MediaType.APPLICATION_JSON)
     @POST
-    public static SampleCollection addCollection(@Valid SampleCollection collection) {
+    public static Irb addCollection(@Valid Irb irb) {
         try {
-            COLLECTIONS.insert(collection)
+            IRBS.insert(irb)
         } catch (MongoException e) {
             throw new WebApplicationException(e)
         }
-        collection
+        irb
     }
 
     @GET
     @Path('/')
     @Timed
     @CacheControl(maxAge = 1, maxAgeUnit = TimeUnit.MINUTES)
-    public static Collection<SampleCollection> list() {
-        COLLECTIONS.find().toArray()
+    public static Collection<Irb> list() {
+        IRBS.find().toArray()
     }
 
     @GET
     @Path('/{id}')
     @Timed
     @CacheControl(maxAge = 1, maxAgeUnit = TimeUnit.HOURS)
-    public static SampleCollection getById(@PathParam("id") String id) {
-        SampleCollection collection = COLLECTIONS.findOne(DBQuery.is("id", id))
-        ResourceHelper.notFoundIfNull(collection)
-        collection
+    public static Irb getById(@PathParam("id") String id) {
+        Irb irb = IRBS.findOne(DBQuery.is("id", id))
+        ResourceHelper.notFoundIfNull(irb)
+        irb
     }
 
     @DELETE
     @Path('/{id}')
     @Timed
     public static Boolean removeById(@PathParam("id") String id) {
-        def result = COLLECTIONS.remove(DBQuery.is("id", id))
+        def result = IRBS.remove(DBQuery.is("id", id))
         if (result.error) {
             throw new WebApplicationException()
         }
@@ -83,28 +89,20 @@ class SampleCollectionResource {
     @Path('/find/{term}')
     @Timed
     @CacheControl(maxAge = 1, maxAgeUnit = TimeUnit.HOURS)
-    public static Collection<SampleCollection> getCollection(@PathParam("term") String term) {
+    public static Collection<Irb> getCollection(@PathParam("term") String term) {
         Pattern p = Pattern.compile(ResourceHelper.decode(term), Pattern.CASE_INSENSITIVE)
-        Collection<SampleCollection> collections = COLLECTIONS.find(
+        Collection<Irb> irbs = IRBS.find(
                 DBQuery.or(
                     DBQuery.regex("id", p),
-                    DBQuery.regex("name", p),
-                    DBQuery.regex("category", p),
-                    DBQuery.regex("groupName", p)
-            )
+                    DBQuery.regex("summary", p),
+                    DBQuery.regex("protocol", p),
+                    DBQuery.regex("status", p),
+                    DBQuery.regex("managers", p),
+                    DBQuery.regex("sampleCollections", p)
+                )
         ).toArray()
-        ResourceHelper.notFoundIfNull(collections.isEmpty() ? null : collections)
-        collections
+        ResourceHelper.notFoundIfNull(irbs.isEmpty() ? null : irbs)
+        irbs
     }
-
-    @POST
-    @Path('/findAll')
-    @Timed
-    @CacheControl(maxAge = 1, maxAgeUnit = TimeUnit.HOURS)
-    public static Collection<SampleCollection> getCollectionsByIds(@Valid Collection<String> ids) {
-        Collection<SampleCollection> collections = COLLECTIONS.find(DBQuery.in("id", ids)).toArray()
-        ResourceHelper.notFoundIfNull(collections.isEmpty() ? null : collections)
-        collections
-    }
-
+    
 }

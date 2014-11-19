@@ -12,31 +12,38 @@ package org.broadinstitute.orsp.ws.domain
 import groovy.transform.EqualsAndHashCode
 import org.codehaus.jackson.annotate.JsonIgnoreProperties
 
+import javax.annotation.Nullable
 import javax.validation.constraints.NotNull
 
 /**
  *
- * Created: 11/13/14
+ * Created: 11/19/14
  *
  * @author <a href="mailto:grushton@broadinstitute.org">grushton</a>
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @EqualsAndHashCode(includes = ["id"])
-class SampleCollection {
+class Irb {
 
     @NotNull
     String id
 
     @NotNull
-    String name
+    String summary
 
     @NotNull
-    String category
+    String location
 
     @NotNull
-    String groupName
+    List<String> managers
 
-    @NotNull
-    String archived
+    @Nullable
+    String protocol
+
+    @Nullable
+    String status
+
+    @Nullable
+    List<String> sampleCollections
 
 }
