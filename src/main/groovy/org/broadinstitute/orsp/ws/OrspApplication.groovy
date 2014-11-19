@@ -1,11 +1,12 @@
 package org.broadinstitute.orsp.ws
 
-import com.hubspot.dropwizard.guice.GuiceBundle
+import com.mongodb.DB
+import com.mongodb.Mongo
 import groovy.util.logging.Slf4j
 import io.dropwizard.Application
 import io.dropwizard.setup.Bootstrap
 import io.dropwizard.setup.Environment
-import org.broadinstitute.orsp.ws.health.SampleCacheHealthCheck
+import org.broadinstitute.orsp.ws.health.MongoHealthCheck
 import org.broadinstitute.orsp.ws.resources.SampleCollectionResource
 
 @Slf4j
@@ -21,10 +22,13 @@ class OrspApplication extends Application<OrspApplicationConfiguration> {
     public void run(OrspApplicationConfiguration configuration,
                     Environment environment) throws ClassNotFoundException {
         log.debug('Running ... ' + name)
+        Mongo mongo = configuration.getMongo()
+        MongoManaged mongoManaged = new MongoManaged(mongo)
+        environment.lifecycle().manage(mongoManaged)
+        DB mongoDb = mongo.getDB(configuration.mongodb);
 
-        final SampleCacheHealthCheck healthCheck = new SampleCacheHealthCheck()
-        environment.healthChecks().register("sampleCache", healthCheck)
-        environment.jersey().register(new SampleCollectionResource())
+        environment.jersey().register(new SampleCollectionResource(mongoDb))
+        environment.healthChecks().register("MongoHealthCheck", new MongoHealthCheck(mongo))
     }
 
     @Override

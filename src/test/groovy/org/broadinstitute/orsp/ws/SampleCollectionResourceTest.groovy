@@ -70,7 +70,7 @@ class SampleCollectionResourceTest {
         client.addFilter(new LoggingFilter())
         ObjectMapper mapper =  JsonFactory.create()
 
-        // post an example sample1 collection:
+        // post a sample1 collection:
         def response = client.resource(
                 String.format(LOCAL_APPLICATION_URL, RULE.getLocalPort())).
                 accept(MediaType.APPLICATION_JSON).
@@ -79,7 +79,7 @@ class SampleCollectionResourceTest {
         SampleCollection responseSample = mapper.readValue(response, SampleCollection.class)
         assertTrue(responseSample.equals(sample1))
 
-        // post an example sample2 collection:
+        // post a sample2 collection:
         response = client.resource(
                 String.format(LOCAL_APPLICATION_URL, RULE.getLocalPort())).
                 accept(MediaType.APPLICATION_JSON).
@@ -88,7 +88,7 @@ class SampleCollectionResourceTest {
         responseSample = mapper.readValue(response, SampleCollection.class)
         assertTrue(responseSample.equals(sample2))
 
-        // retrieve all sample collections and ensure that the one we posted exists
+        // retrieve all sample collections and ensure that the ones we posted exists
         response = client.resource(
                 String.format(LOCAL_APPLICATION_URL, RULE.getLocalPort())).
                 accept(MediaType.APPLICATION_JSON).
@@ -101,7 +101,7 @@ class SampleCollectionResourceTest {
         assertTrue(list.contains(sample1))
         assertTrue(list.contains(sample2))
 
-        // retrieve the sample1 collections matching the ID we posted
+        // retrieve the sample collection matching an ID
         response = client.resource(
                 String.format(LOCAL_APPLICATION_URL + "/" + sample1.id, RULE.getLocalPort())).
                 accept(MediaType.APPLICATION_JSON).
@@ -110,7 +110,7 @@ class SampleCollectionResourceTest {
         responseSample = mapper.readValue(response, SampleCollection.class)
         assertTrue(responseSample.equals(sample1))
 
-        // find the sample1 collections matching the search term we used
+        // find the sample collections matching a search term
         response = client.resource(
                 String.format(LOCAL_APPLICATION_URL + "/find/" + sample1.category, RULE.getLocalPort())).
                 accept(MediaType.APPLICATION_JSON).
@@ -121,6 +121,18 @@ class SampleCollectionResourceTest {
                 List.class,
                 SampleCollection.class)
         assertTrue(list.contains(sample1))
+
+        // find the sample collections matching a lower cased substring search term
+        response = client.resource(
+                String.format(LOCAL_APPLICATION_URL + "/find/" + sample2.name.substring(0,5).toLowerCase(), RULE.getLocalPort())).
+                accept(MediaType.APPLICATION_JSON).
+                type(MediaType.APPLICATION_JSON).
+                get(String.class)
+        list = mapper.readValue(
+                response,
+                List.class,
+                SampleCollection.class)
+        assertTrue(list.contains(sample2))
 
         def ids = [sample1, sample2]*.id
         response = client.resource(
@@ -135,6 +147,20 @@ class SampleCollectionResourceTest {
         assertTrue(response.status == Response.Status.OK.statusCode)
         assertTrue(list.contains(sample1))
         assertTrue(list.contains(sample2))
+
+        response = client.resource(
+                String.format(LOCAL_APPLICATION_URL + "/" + sample1.id, RULE.getLocalPort())).
+                accept(MediaType.APPLICATION_JSON).
+                type(MediaType.APPLICATION_JSON).
+                delete(ClientResponse.class)
+        assertTrue(response.status == Response.Status.OK.statusCode)
+
+        response = client.resource(
+                String.format(LOCAL_APPLICATION_URL + "/" + sample2.id, RULE.getLocalPort())).
+                accept(MediaType.APPLICATION_JSON).
+                type(MediaType.APPLICATION_JSON).
+                delete(ClientResponse.class)
+        assertTrue(response.status == Response.Status.OK.statusCode)
 
     }
 

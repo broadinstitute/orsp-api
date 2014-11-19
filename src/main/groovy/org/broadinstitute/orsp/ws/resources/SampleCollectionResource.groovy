@@ -1,17 +1,20 @@
 package org.broadinstitute.orsp.ws.resources
 
 import com.codahale.metrics.annotation.Timed
+import com.mongodb.DB
+import com.mongodb.MongoException
 import groovy.transform.TypeChecked
-import io.dropwizard.jersey.caching.CacheControl
 import groovy.util.logging.Slf4j
-import org.broadinstitute.orsp.ws.cache.SampleCollectionsCache
+import io.dropwizard.jersey.caching.CacheControl
+import net.vz.mongodb.jackson.DBQuery
+import net.vz.mongodb.jackson.JacksonDBCollection
 import org.broadinstitute.orsp.ws.domain.SampleCollection
 
 import javax.validation.Valid
 import javax.ws.rs.*
 import javax.ws.rs.core.MediaType
-import javax.ws.rs.core.Response
 import java.util.concurrent.TimeUnit
+import java.util.regex.Pattern
 
 @Path('/collection')
 @Produces(MediaType.APPLICATION_JSON)
@@ -19,54 +22,78 @@ import java.util.concurrent.TimeUnit
 @TypeChecked
 class SampleCollectionResource {
 
-    private static SampleCollectionsCache getCache() {
-        SampleCollectionsCache.INSTANCE
+    private static JacksonDBCollection<SampleCollection, String> COLLECTIONS
+
+    SampleCollectionResource(DB mongoDb) {
+        COLLECTIONS = JacksonDBCollection.wrap(
+                mongoDb.getCollection("sampleCollection"),
+                SampleCollection.class, String.class)
     }
 
     @Consumes(MediaType.APPLICATION_JSON)
     @POST
     public static SampleCollection addCollection(@Valid SampleCollection collection) {
-        return getCache().addSampleCollection(collection)
+        try {
+            COLLECTIONS.insert(collection)
+        } catch (MongoException e) {
+            throw new WebApplicationException(e)
+        }
+        collection
     }
 
     @GET
     @Path('/')
-    @Timed(name = 'get-requests')
-    @CacheControl(maxAge = 1, maxAgeUnit = TimeUnit.DAYS)
+    @Timed
+    @CacheControl(maxAge = 1, maxAgeUnit = TimeUnit.MINUTES)
     public static Collection<SampleCollection> list() {
-        return getCache().sampleCollections
+        COLLECTIONS.find().toArray()
     }
 
     @GET
     @Path('/{id}')
     @Timed(name = 'get-requests')
-    @CacheControl(maxAge = 1, maxAgeUnit = TimeUnit.DAYS)
+    @CacheControl(maxAge = 1, maxAgeUnit = TimeUnit.HOURS)
     public static SampleCollection getById(@PathParam("id") String id) {
-        SampleCollection collection = getCache().findByID(id)
-        if (collection == null) {
-            throw new WebApplicationException(Response.Status.NOT_FOUND)
+        SampleCollection collection = COLLECTIONS.findOne(DBQuery.is("id", id))
+        ResourceHelper.notFoundIfNull(collection)
+        collection
+    }
+
+    @DELETE
+    @Path('/{id}')
+    @Timed
+    public static Boolean removeById(@PathParam("id") String id) {
+        def result = COLLECTIONS.remove(DBQuery.is("id", id))
+        if (result.error) {
+            throw new WebApplicationException()
         }
-        return collection
+        true
     }
 
     @GET
     @Path('/find/{term}')
-    @Timed(name = 'get-requests')
-    @CacheControl(maxAge = 1, maxAgeUnit = TimeUnit.DAYS)
+    @Timed
+    @CacheControl(maxAge = 1, maxAgeUnit = TimeUnit.HOURS)
     public static Collection<SampleCollection> getCollection(@PathParam("term") String term) {
-        return getCache().findCollectionsBySearchTerm(term)
+        Pattern p = Pattern.compile(term, Pattern.CASE_INSENSITIVE)
+        Collection<SampleCollection> collections = COLLECTIONS.find(DBQuery.or(
+                DBQuery.regex("id", p),
+                DBQuery.regex("name", p),
+                DBQuery.regex("category", p),
+                DBQuery.regex("groupName", p)
+        )).toArray()
+        ResourceHelper.notFoundIfNull(collections.isEmpty() ? null : collections)
+        collections
     }
 
     @POST
     @Path('/findAll')
-    @Timed(name = 'get-requests')
-    @CacheControl(maxAge = 1, maxAgeUnit = TimeUnit.DAYS)
+    @Timed
+    @CacheControl(maxAge = 1, maxAgeUnit = TimeUnit.HOURS)
     public static Collection<SampleCollection> getCollectionsByIds(@Valid Collection<String> ids) {
-        Collection<SampleCollection> collections = getCache().findCollectionsByIDs(ids)
-        if (collections.isEmpty()) {
-            throw new WebApplicationException(Response.Status.NOT_FOUND)
-        }
-        return collections
+        Collection<SampleCollection> collections = COLLECTIONS.find(DBQuery.in("id", ids)).toArray()
+        ResourceHelper.notFoundIfNull(collections.isEmpty() ? null : collections)
+        collections
     }
 
 }

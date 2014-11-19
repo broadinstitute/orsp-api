@@ -1,18 +1,24 @@
 # HTTP-specific options.
 server:
-  type: simple
-  applicationContextPath: /
-  adminContextPath: /admin
-  connector:
-    type: http
-    port: 8181
+  applicationConnectors:
+    - type: http
+      port: 8181
+  adminConnectors:
+    - type: http
+      port: 8282
+
+mongohost: localhost
+mongoport: 27017
+mongodb: orsp-api-test
 
 # Logging settings.
 logging:
+
   # The default level of all loggers. Can be OFF, ERROR, WARN, INFO, DEBUG, TRACE, or ALL.
   level: INFO
 
   # Logger-specific levels.
   loggers:
+
     # Sets the level for 'com.example.app' to DEBUG.
-    org.broadinstitute: DEBUG
+    org.broadinstitute.orsp: DEBUG

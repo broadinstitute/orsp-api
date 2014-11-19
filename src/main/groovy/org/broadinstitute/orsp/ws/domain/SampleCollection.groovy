@@ -1,6 +1,7 @@
 package org.broadinstitute.orsp.ws.domain
 
 import groovy.transform.EqualsAndHashCode
+import org.codehaus.jackson.annotate.JsonIgnoreProperties
 
 import javax.validation.constraints.NotNull
 
@@ -10,6 +11,7 @@ import javax.validation.constraints.NotNull
  *
  * @author <a href="mailto:grushton@broadinstitute.org">grushton</a>
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 @EqualsAndHashCode(includes = ["id"])
 class SampleCollection {
 
