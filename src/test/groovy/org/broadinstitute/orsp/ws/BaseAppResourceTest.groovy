@@ -12,13 +12,7 @@ package org.broadinstitute.orsp.ws
 import com.google.common.io.Resources
 import com.sun.jersey.api.client.Client
 import com.sun.jersey.api.client.filter.LoggingFilter
-import io.dropwizard.testing.junit.DropwizardAppRule
-import org.apache.commons.lang.CharSet
 import org.apache.commons.lang3.CharEncoding
-import org.junit.ClassRule
-
-import java.nio.charset.Charset
-import java.nio.charset.StandardCharsets
 
 /**
  *
@@ -28,12 +22,7 @@ import java.nio.charset.StandardCharsets
  */
 class BaseAppResourceTest {
 
-    @SuppressWarnings("GroovyAssignabilityCheck")
-    @ClassRule
-    public static final DropwizardAppRule<TestConfiguration> RULE =
-            new DropwizardAppRule<TestConfiguration>(OrspApplication.class, resourceFilePath("test-app-config.yml"))
-
-    private static String resourceFilePath(String resourceClassPathLocation) {
+    protected static String resourceFilePath(String resourceClassPathLocation) {
         try {
             return new File(Resources.getResource(resourceClassPathLocation).toURI()).getAbsolutePath()
         } catch (Exception e) {

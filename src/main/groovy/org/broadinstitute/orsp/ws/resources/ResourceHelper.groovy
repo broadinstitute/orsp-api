@@ -9,10 +9,11 @@
  */
 package org.broadinstitute.orsp.ws.resources
 
-import org.apache.commons.lang.CharEncoding
 
 import javax.ws.rs.WebApplicationException
 import javax.ws.rs.core.Response
+
+import org.apache.commons.lang3.CharEncoding
 
 /**
  *

@@ -12,9 +12,11 @@ package org.broadinstitute.orsp.ws
 import com.sun.jersey.api.client.Client
 import com.sun.jersey.api.client.ClientResponse
 import groovy.json.JsonBuilder
+import io.dropwizard.testing.junit.DropwizardAppRule
 import org.boon.json.JsonFactory
 import org.boon.json.ObjectMapper
 import org.broadinstitute.orsp.ws.domain.Irb
+import org.junit.ClassRule
 import org.junit.Test
 
 import javax.ws.rs.core.MediaType
@@ -29,6 +31,11 @@ import static org.junit.Assert.assertTrue
  * @author <a href="mailto:grushton@broadinstitute.org">grushton</a>
  */
 class IrbResourceTest extends BaseAppResourceTest {
+
+    @SuppressWarnings("GroovyAssignabilityCheck")
+    @ClassRule
+    public static final DropwizardAppRule<TestConfiguration> RULE =
+            new DropwizardAppRule<TestConfiguration>(OrspApplication.class, resourceFilePath("test-app-config.yml"))
 
     private static final String LOCAL_APPLICATION_URL = "http://localhost:%d/irb"
 

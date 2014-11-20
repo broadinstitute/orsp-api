@@ -1,4 +1,4 @@
-orsp-ws
+orsp-api
 =======
 
-ORSP Compliance Portal Web Services
+ORSP Compliance Portal API

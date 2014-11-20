@@ -1,0 +1,17 @@
+# .travis.yml
+language: java
+
+jdk:
+  - oraclejdk8
+
+services:
+  - mongodb
+
+before_script:
+  - sleep 15
+
+branches:
+  only:
+    - develop
+
+gradle test
