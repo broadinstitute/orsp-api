@@ -7,7 +7,7 @@
  * This software is supplied without any warranty or guaranteed support whatsoever. Neither
  * the Broad Institute nor MIT can be responsible for its use, misuse, or functionality.
  */
-package org.broadinstitute.orsp.ws.resources
+package org.broadinstitute.orsp.api.resources
 
 import com.codahale.metrics.annotation.Timed
 import com.mongodb.DB
@@ -17,7 +17,7 @@ import groovy.util.logging.Slf4j
 import io.dropwizard.jersey.caching.CacheControl
 import net.vz.mongodb.jackson.DBQuery
 import net.vz.mongodb.jackson.JacksonDBCollection
-import org.broadinstitute.orsp.ws.domain.SampleCollection
+import org.broadinstitute.orsp.api.domain.SampleCollection
 
 import javax.validation.Valid
 import javax.ws.rs.*

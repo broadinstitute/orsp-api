@@ -14,7 +14,7 @@ apply plugin: 'maven'
 apply plugin: 'application'
 apply plugin: 'idea'
 
-mainClassName = 'org.broadinstitute.orsp.ws.OrspApplication'
+mainClassName = 'org.broadinstitute.orsp.api.OrspApplication'
 
 repositories {
     mavenLocal()

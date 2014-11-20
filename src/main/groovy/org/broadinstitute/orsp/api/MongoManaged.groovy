@@ -7,17 +7,33 @@
  * This software is supplied without any warranty or guaranteed support whatsoever. Neither
  * the Broad Institute nor MIT can be responsible for its use, misuse, or functionality.
  */
-package org.broadinstitute.orsp.ws
+package org.broadinstitute.orsp.api
 
 import com.mongodb.Mongo
+import io.dropwizard.lifecycle.Managed
 
-class TestConfiguration extends OrspApplicationConfiguration {
+/**
+ *
+ * Created: 11/17/14
+ *
+ * @author <a href="mailto:grushton@broadinstitute.org">grushton</a>
+ */
+class MongoManaged implements Managed {
 
-    // TODO: Look into embedded mongo for testing like hsqldb:
-    //      https://github.com/flapdoodle-oss/de.flapdoodle.embed.mongo
+    private Mongo mongo
+
+    public MongoManaged(Mongo mongo) {
+          this.mongo = mongo
+    }
+
     @Override
-    public Mongo getMongo() {
-        new Mongo(mongohost, mongoport)
+    public void start() throws Exception {
+
+    }
+
+    @Override
+    public void stop() throws Exception {
+        mongo.close()
     }
 
 }

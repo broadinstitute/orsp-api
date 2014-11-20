@@ -7,43 +7,36 @@
  * This software is supplied without any warranty or guaranteed support whatsoever. Neither
  * the Broad Institute nor MIT can be responsible for its use, misuse, or functionality.
  */
-package org.broadinstitute.orsp.ws.domain
+package org.broadinstitute.orsp.api.domain
 
 import groovy.transform.EqualsAndHashCode
 import org.codehaus.jackson.annotate.JsonIgnoreProperties
 
-import javax.annotation.Nullable
 import javax.validation.constraints.NotNull
 
 /**
  *
- * Created: 11/19/14
+ * Created: 11/13/14
  *
  * @author <a href="mailto:grushton@broadinstitute.org">grushton</a>
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @EqualsAndHashCode(includes = ["id"])
-class Irb {
+class SampleCollection {
 
     @NotNull
     String id
 
     @NotNull
-    String summary
+    String name
 
     @NotNull
-    String location
+    String category
 
     @NotNull
-    List<String> managers
+    String groupName
 
-    @Nullable
-    String protocol
-
-    @Nullable
-    String status
-
-    @Nullable
-    List<String> sampleCollections
+    @NotNull
+    String archived
 
 }

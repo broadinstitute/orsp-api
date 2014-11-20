@@ -7,7 +7,7 @@
  * This software is supplied without any warranty or guaranteed support whatsoever. Neither
  * the Broad Institute nor MIT can be responsible for its use, misuse, or functionality.
  */
-package org.broadinstitute.orsp.ws
+package org.broadinstitute.orsp.api
 
 import com.mongodb.DB
 import com.mongodb.Mongo
@@ -15,9 +15,9 @@ import groovy.util.logging.Slf4j
 import io.dropwizard.Application
 import io.dropwizard.setup.Bootstrap
 import io.dropwizard.setup.Environment
-import org.broadinstitute.orsp.ws.health.MongoHealthCheck
-import org.broadinstitute.orsp.ws.resources.IrbResource
-import org.broadinstitute.orsp.ws.resources.SampleCollectionResource
+import org.broadinstitute.orsp.api.health.MongoHealthCheck
+import org.broadinstitute.orsp.api.resources.IrbResource
+import org.broadinstitute.orsp.api.resources.SampleCollectionResource
 
 @Slf4j
 class OrspApplication extends Application<OrspApplicationConfiguration> {

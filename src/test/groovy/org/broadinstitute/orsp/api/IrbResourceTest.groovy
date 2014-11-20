@@ -7,7 +7,7 @@
  * This software is supplied without any warranty or guaranteed support whatsoever. Neither
  * the Broad Institute nor MIT can be responsible for its use, misuse, or functionality.
  */
-package org.broadinstitute.orsp.ws
+package org.broadinstitute.orsp.api
 
 import com.sun.jersey.api.client.Client
 import com.sun.jersey.api.client.ClientResponse
@@ -15,7 +15,7 @@ import groovy.json.JsonBuilder
 import io.dropwizard.testing.junit.DropwizardAppRule
 import org.boon.json.JsonFactory
 import org.boon.json.ObjectMapper
-import org.broadinstitute.orsp.ws.domain.Irb
+import org.broadinstitute.orsp.api.domain.Irb
 import org.junit.ClassRule
 import org.junit.Test
 

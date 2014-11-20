@@ -7,7 +7,7 @@
  * This software is supplied without any warranty or guaranteed support whatsoever. Neither
  * the Broad Institute nor MIT can be responsible for its use, misuse, or functionality.
  */
-package org.broadinstitute.orsp.ws.resources
+package org.broadinstitute.orsp.api.resources
 
 
 import javax.ws.rs.WebApplicationException
