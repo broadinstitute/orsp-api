@@ -16,6 +16,7 @@ import io.dropwizard.testing.junit.DropwizardAppRule
 import org.boon.json.JsonFactory
 import org.boon.json.ObjectMapper
 import org.broadinstitute.orsp.api.domain.Irb
+import org.junit.After
 import org.junit.ClassRule
 import org.junit.Test
 
@@ -55,6 +56,64 @@ class IrbResourceTest extends BaseAppResourceTest {
             status: "Complete",
             sampleCollections: ["SC-1", "SC-2"]
     )
+
+    @After
+    public void cleanUp() {
+        Client client = getClient()
+        client.resource(
+                String.format(LOCAL_APPLICATION_URL + "/" + irb1.id, RULE.getLocalPort())).
+                accept(MediaType.APPLICATION_JSON).
+                type(MediaType.APPLICATION_JSON).
+                delete(ClientResponse.class)
+        client.resource(
+                String.format(LOCAL_APPLICATION_URL + "/" + irb2.id, RULE.getLocalPort())).
+                accept(MediaType.APPLICATION_JSON).
+                type(MediaType.APPLICATION_JSON).
+                delete(ClientResponse.class)
+    }
+
+    @Test
+    public void testUpsert() {
+        Client client = getClient()
+        ObjectMapper mapper = JsonFactory.create()
+
+        // Insert the irb
+        client.resource(
+                String.format(LOCAL_APPLICATION_URL, RULE.getLocalPort())).
+                accept(MediaType.APPLICATION_JSON).
+                type(MediaType.APPLICATION_JSON).
+                post(String.class, new JsonBuilder(irb1).toString())
+
+        // Update the irb with a new protocol #
+        irb1.protocol = "12345"
+        client.resource(
+                String.format(LOCAL_APPLICATION_URL, RULE.getLocalPort())).
+                accept(MediaType.APPLICATION_JSON).
+                type(MediaType.APPLICATION_JSON).
+                post(String.class, new JsonBuilder(irb1).toString())
+
+        // Get that irb back from the data store
+        def response = client.resource(
+                String.format(LOCAL_APPLICATION_URL + "/" + irb1.id, RULE.getLocalPort())).
+                accept(MediaType.APPLICATION_JSON).
+                type(MediaType.APPLICATION_JSON).
+                get(String.class)
+        Irb irb = mapper.readValue(response, Irb.class)
+        assertTrue(irb1.protocol.equals(irb.protocol))
+
+        // Make sure we don't have duplicates
+        response = client.resource(
+                String.format(LOCAL_APPLICATION_URL, RULE.getLocalPort())).
+                accept(MediaType.APPLICATION_JSON).
+                type(MediaType.APPLICATION_JSON).
+                get(String.class)
+        ArrayList list = mapper.readValue(
+                response,
+                List.class,
+                Irb.class)
+        assertTrue(list.size() == 1)
+        assertTrue(list.contains(irb1))
+    }
 
     @Test
     public void testNotFound() {
@@ -142,7 +201,7 @@ class IrbResourceTest extends BaseAppResourceTest {
                 Irb.class)
         assertTrue(list.contains(irb1))
 
-        // Search a collection
+        // Search for irbs
         response = client.resource(
                 String.format(LOCAL_APPLICATION_URL + "/find/" + urlEncode(irb1.managers[1]), RULE.getLocalPort())).
                 accept(MediaType.APPLICATION_JSON).
@@ -168,13 +227,6 @@ class IrbResourceTest extends BaseAppResourceTest {
         // Delete
         response = client.resource(
                 String.format(LOCAL_APPLICATION_URL + "/" + irb1.id, RULE.getLocalPort())).
-                accept(MediaType.APPLICATION_JSON).
-                type(MediaType.APPLICATION_JSON).
-                delete(ClientResponse.class)
-        assertTrue(response.status == Response.Status.OK.statusCode)
-
-        response = client.resource(
-                String.format(LOCAL_APPLICATION_URL + "/" + irb2.id, RULE.getLocalPort())).
                 accept(MediaType.APPLICATION_JSON).
                 type(MediaType.APPLICATION_JSON).
                 delete(ClientResponse.class)

@@ -47,8 +47,9 @@ class IrbResource {
 
     @Consumes(MediaType.APPLICATION_JSON)
     @POST
-    public static Irb addCollection(@Valid Irb irb) {
+    public static Irb add(@Valid Irb irb) {
         try {
+            IRBS.findAndRemove(DBQuery.is("id", irb.id))
             IRBS.insert(irb)
         } catch (MongoException e) {
             throw new WebApplicationException(e)
@@ -57,7 +58,6 @@ class IrbResource {
     }
 
     @GET
-    @Path('/')
     @Timed
     @CacheControl(maxAge = 1, maxAgeUnit = TimeUnit.MINUTES)
     public static Collection<Irb> list() {
@@ -78,8 +78,8 @@ class IrbResource {
     @Path('/{id}')
     @Timed
     public static Boolean removeById(@PathParam("id") String id) {
-        def result = IRBS.remove(DBQuery.is("id", id))
-        if (result.error) {
+        def result = IRBS.findAndRemove(DBQuery.is("id", id))
+        if (!result) {
             throw new WebApplicationException()
         }
         true

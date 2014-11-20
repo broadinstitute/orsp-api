@@ -15,7 +15,9 @@ import groovy.json.JsonBuilder
 import io.dropwizard.testing.junit.DropwizardAppRule
 import org.boon.json.JsonFactory
 import org.boon.json.ObjectMapper
+import org.broadinstitute.orsp.api.domain.Irb
 import org.broadinstitute.orsp.api.domain.SampleCollection
+import org.junit.After
 import org.junit.ClassRule
 import org.junit.Test
 
@@ -49,6 +51,63 @@ class SampleCollectionResourceTest extends BaseAppResourceTest {
             groupName: "Population",
             archived: "0"
     )
+
+    @After
+    public void cleanUp() {
+        Client client = getClient()
+        client.resource(
+                String.format(LOCAL_APPLICATION_URL + "/" + sample1.id, RULE.getLocalPort())).
+                accept(MediaType.APPLICATION_JSON).
+                type(MediaType.APPLICATION_JSON).
+                delete(ClientResponse.class)
+        client.resource(
+                String.format(LOCAL_APPLICATION_URL + "/" + sample2.id, RULE.getLocalPort())).
+                accept(MediaType.APPLICATION_JSON).
+                type(MediaType.APPLICATION_JSON).
+                delete(ClientResponse.class)
+    }
+    @Test
+    public void testUpsert() {
+        Client client = getClient()
+        ObjectMapper mapper = JsonFactory.create()
+
+        // Insert the sample
+        client.resource(
+                String.format(LOCAL_APPLICATION_URL, RULE.getLocalPort())).
+                accept(MediaType.APPLICATION_JSON).
+                type(MediaType.APPLICATION_JSON).
+                post(String.class, new JsonBuilder(sample1).toString())
+
+        // Update the sample with a new group name
+        sample1.groupName = "Test Group"
+        client.resource(
+                String.format(LOCAL_APPLICATION_URL, RULE.getLocalPort())).
+                accept(MediaType.APPLICATION_JSON).
+                type(MediaType.APPLICATION_JSON).
+                post(String.class, new JsonBuilder(sample1).toString())
+
+        // Get that sample back from the data store
+        def response = client.resource(
+                String.format(LOCAL_APPLICATION_URL + "/" + sample1.id, RULE.getLocalPort())).
+                accept(MediaType.APPLICATION_JSON).
+                type(MediaType.APPLICATION_JSON).
+                get(String.class)
+        SampleCollection collection = mapper.readValue(response, SampleCollection.class)
+        assertTrue(sample1.groupName.equals(collection.groupName))
+
+        // Make sure we don't have duplicates
+        response = client.resource(
+                String.format(LOCAL_APPLICATION_URL, RULE.getLocalPort())).
+                accept(MediaType.APPLICATION_JSON).
+                type(MediaType.APPLICATION_JSON).
+                get(String.class)
+        ArrayList list = mapper.readValue(
+                response,
+                List.class,
+                SampleCollection.class)
+        assertTrue(list.size() == 1)
+        assertTrue(list.contains(sample1))
+    }
 
     @Test
     public void testNotFound() {
@@ -155,13 +214,6 @@ class SampleCollectionResourceTest extends BaseAppResourceTest {
 
         response = client.resource(
                 String.format(LOCAL_APPLICATION_URL + "/" + sample1.id, RULE.getLocalPort())).
-                accept(MediaType.APPLICATION_JSON).
-                type(MediaType.APPLICATION_JSON).
-                delete(ClientResponse.class)
-        assertTrue(response.status == Response.Status.OK.statusCode)
-
-        response = client.resource(
-                String.format(LOCAL_APPLICATION_URL + "/" + sample2.id, RULE.getLocalPort())).
                 accept(MediaType.APPLICATION_JSON).
                 type(MediaType.APPLICATION_JSON).
                 delete(ClientResponse.class)

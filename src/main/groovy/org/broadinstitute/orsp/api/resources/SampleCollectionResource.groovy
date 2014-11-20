@@ -41,8 +41,9 @@ class SampleCollectionResource {
 
     @Consumes(MediaType.APPLICATION_JSON)
     @POST
-    public static SampleCollection addCollection(@Valid SampleCollection collection) {
+    public static SampleCollection add(@Valid SampleCollection collection) {
         try {
+            COLLECTIONS.findAndRemove(DBQuery.is("id", collection.id))
             COLLECTIONS.insert(collection)
         } catch (MongoException e) {
             throw new WebApplicationException(e)
@@ -51,7 +52,6 @@ class SampleCollectionResource {
     }
 
     @GET
-    @Path('/')
     @Timed
     @CacheControl(maxAge = 1, maxAgeUnit = TimeUnit.MINUTES)
     public static Collection<SampleCollection> list() {
@@ -72,8 +72,8 @@ class SampleCollectionResource {
     @Path('/{id}')
     @Timed
     public static Boolean removeById(@PathParam("id") String id) {
-        def result = COLLECTIONS.remove(DBQuery.is("id", id))
-        if (result.error) {
+        def result = COLLECTIONS.findAndRemove(DBQuery.is("id", id))
+        if (!result) {
             throw new WebApplicationException()
         }
         true
