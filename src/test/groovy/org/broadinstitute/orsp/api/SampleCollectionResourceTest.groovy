@@ -15,7 +15,6 @@ import groovy.json.JsonBuilder
 import io.dropwizard.testing.junit.DropwizardAppRule
 import org.boon.json.JsonFactory
 import org.boon.json.ObjectMapper
-import org.broadinstitute.orsp.api.domain.Irb
 import org.broadinstitute.orsp.api.domain.SampleCollection
 import org.junit.After
 import org.junit.ClassRule
