@@ -1,9 +1,11 @@
+
 buildscript {
     repositories {
         mavenLocal()
         jcenter()
-        maven {
-            url 'http://repo.jfrog.org/artifactory/gradle-plugins'
+        maven { url 'https://oss.jfrog.org/repo/' }
+        dependencies {
+            classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.0-SNAPSHOT'
         }
     }
 }
@@ -13,6 +15,7 @@ apply plugin: 'groovy'
 apply plugin: 'maven'
 apply plugin: 'application'
 apply plugin: 'idea'
+apply plugin: 'com.github.johnrengelman.shadow'
 
 mainClassName = 'org.broadinstitute.orsp.api.OrspApplication'
 
@@ -70,20 +73,21 @@ run {
     args 'server', dropwizardAppConfig
 }
 
-
-task fatJar(type: Jar) {
+jar {
     manifest {
         attributes 'Main-Class': mainClassName
-        attributes 'Built-Date': new Date() //now
         attributes 'Built-By': System.getProperty('user.name')
         attributes 'Build-Jdk': System.getProperty('java.version')
+        attributes 'BUILD_NUMBER': System.env.BUILD_NUMBER ?: 'LOCAL'
+        attributes 'BUILD_URL': System.env.BUILD_URL ?: 'LOCAL'
+        attributes 'GIT_COMMIT': System.env.GIT_COMMIT ?: 'LOCAL'
+        attributes 'GIT_BRANCH': System.env.GIT_BRANCH ?: 'LOCAL'
         attributes 'Implementation-Title': project.name
         attributes 'Implementation-Version': project.version
         attributes 'Implementation-Vendor-Id': project.group
     }
-    exclude 'META-INF/*.DSA', 'META-INF/*.RSA', 'META-INF/*.SF'
-    baseName = project.name + '-all'
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-    with jar
 }
 
+shadowJar {
+    mergeServiceFiles()
+}
