@@ -1,4 +1,4 @@
-from docker/java/oracle-java8
+from dockerfile/java:oracle-java8
 maintainer Gregory Rushton <grushton@broadinstitute.org>
 
 # Install Git
