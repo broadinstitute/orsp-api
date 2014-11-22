@@ -101,7 +101,7 @@ class IrbResource {
                     DBQuery.regex("sampleCollections", p)
                 )
         ).toArray()
-        ResourceHelper.notFoundIfNull(irbs.isEmpty() ? null : irbs)
+        ResourceHelper.notFoundIfEmpty(irbs)
         irbs
     }
     

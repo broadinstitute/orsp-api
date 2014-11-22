@@ -27,6 +27,12 @@ class ResourceHelper {
         errorIfNull(obj, Response.Status.NOT_FOUND)
     }
 
+    public static void notFoundIfEmpty(Collection collection) {
+        if (collection.isEmpty()) {
+            throw new WebApplicationException(Response.Status.NOT_FOUND)
+        }
+    }
+
     public static void errorIfNull(Object obj, Response.Status status) {
         if (obj == null) {
             throw new WebApplicationException(status)

@@ -93,7 +93,7 @@ class SampleCollectionResource {
                     DBQuery.regex("groupName", p)
             )
         ).toArray()
-        ResourceHelper.notFoundIfNull(collections.isEmpty() ? null : collections)
+        ResourceHelper.notFoundIfEmpty(collections)
         collections
     }
 
