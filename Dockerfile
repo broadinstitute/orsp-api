@@ -1,4 +1,4 @@
-from centos
+from ubuntu
 maintainer Gregory Rushton <grushton@broadinstitute.org>
 
 # Install curl with ssl support
