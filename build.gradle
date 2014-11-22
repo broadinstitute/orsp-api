@@ -39,13 +39,12 @@ dependencies {
     compile "io.dropwizard:dropwizard-core:${dropwizardVersion}"
     compile "io.dropwizard:dropwizard-testing:${dropwizardVersion}"
     compile "io.dropwizard:dropwizard-hibernate:${dropwizardVersion}"
-    compile "io.dropwizard:dropwizard-migrations:${dropwizardVersion}"
     compile "io.dropwizard:dropwizard-jackson:${dropwizardVersion}"
     compile "io.dropwizard:dropwizard-auth:${dropwizardVersion}"
     compile "io.dropwizard:dropwizard-client:${dropwizardVersion}"
     compile "io.dropwizard:dropwizard-assets:${dropwizardVersion}"
     compile "io.dropwizard:dropwizard-views:${dropwizardVersion}"
-    compile "io.dropwizard:dropwizard-jdbi:${dropwizardVersion}"
+    compile "io.dropwizard:dropwizard-views-freemarker:${dropwizardVersion}"
     compile "org.slf4j:jul-to-slf4j:1.7.2"
     compile "org.slf4j:slf4j-api:1.7.2"
     compile 'org.apache.commons:commons-lang3:3.3.2'
@@ -63,7 +62,6 @@ dependencies {
 
     testCompile "io.dropwizard:dropwizard-testing:${dropwizardVersion}"
     testCompile "org.spockframework:spock-core:1.0-groovy-2.0-SNAPSHOT"
-    testCompile 'org.slf4j:log4j-over-slf4j:1.7.2'
     testRuntime "cglib:cglib-nodep:2.2.2"          // allows mocking of classes (in addition to interfaces)
     testRuntime "org.objenesis:objenesis:1.2"    // allows mocking of classes without default constructor (together with CGLIB)
 
