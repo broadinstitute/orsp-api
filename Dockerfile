@@ -7,8 +7,7 @@ run apt-get install -y git
 # Clone project
 run git clone https://github.com/broadinstitute/orsp-api.git
 
-run cd orsp-api
-run ./gradlew shadowJar
+cmd ["./orsp-api/gradlew", "shadowJar"]
 
 # Expose the http port
 expose 8181
