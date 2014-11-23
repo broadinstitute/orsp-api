@@ -7,8 +7,8 @@ server:
     - type: http
       port: 8282
 
-mongohost: localhost
-#mongohost: orsp-api-mongo-arb-iuex
+#mongohost: localhost
+mongohost: orsp-api-mongo-arb-lmex
 mongoport: 27017
 mongodb: orsp-api
 
