@@ -1,18 +1,22 @@
-from dockerfile/java:oracle-java8
+FROM debian:jessie
+FROM dockerfile/java:oracle-java8
+
 maintainer Gregory Rushton <grushton@broadinstitute.org>
 
 # Install Git
 run apt-get install -y git
 
 # Clone project
-run git clone https://github.com/broadinstitute/orsp-api.git
+run git clone https://github.com/broadinstitute/orsp-api.git .
 
-cmd ["./orsp-api/gradlew", "shadowJar"]
+run git pull
 
-# Expose the http port
+run ./gradlew shadowJar
+
+# Expose the http ports
 expose 8181
 expose 8282
 
-workdir orsp-api
+run ls -al build/libs
 
-# cmd ["java", "-jar", "build/lib/orsp-api-all.jar", "server", "src/main/resources/appconfig.yml"]
+cmd ["java", "-jar", "build/libs/data-all.jar", "server", "src/main/resources/appconfig.yml"]
