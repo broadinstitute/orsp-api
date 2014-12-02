@@ -61,12 +61,7 @@ class IrbResourceTest extends BaseAppResourceTest {
     public void cleanUp() {
         Client client = getClient()
         client.resource(
-                String.format(LOCAL_APPLICATION_URL + "/" + irb1.id, RULE.getLocalPort())).
-                accept(MediaType.APPLICATION_JSON).
-                type(MediaType.APPLICATION_JSON).
-                delete(ClientResponse.class)
-        client.resource(
-                String.format(LOCAL_APPLICATION_URL + "/" + irb2.id, RULE.getLocalPort())).
+                String.format(LOCAL_APPLICATION_URL, RULE.getLocalPort())).
                 accept(MediaType.APPLICATION_JSON).
                 type(MediaType.APPLICATION_JSON).
                 delete(ClientResponse.class)
@@ -113,6 +108,41 @@ class IrbResourceTest extends BaseAppResourceTest {
                 Irb.class)
         assertTrue(list.size() == 1)
         assertTrue(list.contains(irb1))
+    }
+
+    @Test
+    public void testRemoveAll() {
+        Client client = getClient()
+        ObjectMapper mapper = JsonFactory.create()
+        // Add
+        client.resource(
+                String.format(LOCAL_APPLICATION_URL, RULE.getLocalPort())).
+                accept(MediaType.APPLICATION_JSON).
+                type(MediaType.APPLICATION_JSON).
+                post(String.class, new JsonBuilder(irb1).toString())
+        // Add
+        client.resource(
+                String.format(LOCAL_APPLICATION_URL, RULE.getLocalPort())).
+                accept(MediaType.APPLICATION_JSON).
+                type(MediaType.APPLICATION_JSON).
+                post(String.class, new JsonBuilder(irb2).toString())
+        // Delete
+        client.resource(
+                String.format(LOCAL_APPLICATION_URL, RULE.getLocalPort())).
+                accept(MediaType.APPLICATION_JSON).
+                type(MediaType.APPLICATION_JSON).
+                delete(ClientResponse.class)
+        // Find all
+        def response = client.resource(
+                String.format(LOCAL_APPLICATION_URL, RULE.getLocalPort())).
+                accept(MediaType.APPLICATION_JSON).
+                type(MediaType.APPLICATION_JSON).
+                get(String.class)
+        List<Irb> list = mapper.readValue(
+                response,
+                List.class,
+                Irb.class)
+        assertTrue(list.isEmpty())
     }
 
     @Test

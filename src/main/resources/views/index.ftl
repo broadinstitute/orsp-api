@@ -64,7 +64,7 @@
         String location
 
         @NotNull
-        List<String> managers
+        List&lt;String> managers
 
         @Nullable
         String protocol
@@ -73,15 +73,15 @@
         String status
 
         @Nullable
-        List<String> sampleCollections
+        List&lt;String> sampleCollections
     }
 
-
-    DELETE  /irb/{id} (org.broadinstitute.orsp.api.resources.IrbResource)
     GET     /irb (org.broadinstitute.orsp.api.resources.IrbResource)
-    GET     /irb/find/{term} (org.broadinstitute.orsp.api.resources.IrbResource)
     GET     /irb/{id} (org.broadinstitute.orsp.api.resources.IrbResource)
+    GET     /irb/find/{term} (org.broadinstitute.orsp.api.resources.IrbResource)
     POST    /irb (org.broadinstitute.orsp.api.resources.IrbResource)
+    DELETE  /irb (org.broadinstitute.orsp.api.resources.IrbResource)
+    DELETE  /irb/{id} (org.broadinstitute.orsp.api.resources.IrbResource)
     </pre>
 
     <h2>Sample Collection APIs</h2>
@@ -105,12 +105,13 @@
 
     }
 
-    DELETE  /collection/{id} (org.broadinstitute.orsp.api.resources.SampleCollectionResource)
     GET     /collection (org.broadinstitute.orsp.api.resources.SampleCollectionResource)
-    GET     /collection/find/{term} (org.broadinstitute.orsp.api.resources.SampleCollectionResource)
     GET     /collection/{id} (org.broadinstitute.orsp.api.resources.SampleCollectionResource)
+    GET     /collection/find/{term} (org.broadinstitute.orsp.api.resources.SampleCollectionResource)
     POST    /collection (org.broadinstitute.orsp.api.resources.SampleCollectionResource)
     POST    /collection/findAll (org.broadinstitute.orsp.api.resources.SampleCollectionResource)
+    DELETE  /collection (org.broadinstitute.orsp.api.resources.SampleCollectionResource)
+    DELETE  /collection/{id} (org.broadinstitute.orsp.api.resources.SampleCollectionResource)
     </pre>
 </div>
 

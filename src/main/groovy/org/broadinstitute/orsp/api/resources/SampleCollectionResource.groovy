@@ -41,14 +41,13 @@ class SampleCollectionResource {
 
     @Consumes(MediaType.APPLICATION_JSON)
     @POST
-    public static SampleCollection add(@Valid SampleCollection collection) {
+    public static Object add(@Valid SampleCollection collection) {
         try {
             COLLECTIONS.findAndRemove(DBQuery.is("id", collection.id))
-            COLLECTIONS.insert(collection)
+            return ResourceHelper.errorIfNull(COLLECTIONS.insert(collection).savedObject)
         } catch (MongoException e) {
             throw new WebApplicationException(e)
         }
-        collection
     }
 
     @GET
@@ -75,6 +74,19 @@ class SampleCollectionResource {
         def result = COLLECTIONS.findAndRemove(DBQuery.is("id", id))
         if (!result) {
             throw new WebApplicationException()
+        }
+        true
+    }
+
+    @DELETE
+    @Timed
+    public static Boolean removeAll() {
+        try {
+            COLLECTIONS.find().toArray().each {
+                COLLECTIONS.findAndRemove(DBQuery.is("id", it.id))
+            }
+        } catch (MongoException e) {
+            throw new WebApplicationException(e)
         }
         true
     }

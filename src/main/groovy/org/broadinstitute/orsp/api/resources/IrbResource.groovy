@@ -22,6 +22,7 @@ import org.broadinstitute.orsp.api.domain.Irb
 import javax.validation.Valid
 import javax.ws.rs.*
 import javax.ws.rs.core.MediaType
+import javax.ws.rs.core.Response
 import java.util.concurrent.TimeUnit
 import java.util.regex.Pattern
 
@@ -47,14 +48,13 @@ class IrbResource {
 
     @Consumes(MediaType.APPLICATION_JSON)
     @POST
-    public static Irb add(@Valid Irb irb) {
+    public static Object add(@Valid Irb irb) {
         try {
             IRBS.findAndRemove(DBQuery.is("id", irb.id))
-            IRBS.insert(irb)
+            return ResourceHelper.errorIfNull(IRBS.insert(irb).savedObject)
         } catch (MongoException e) {
             throw new WebApplicationException(e)
         }
-        irb
     }
 
     @GET
@@ -81,6 +81,19 @@ class IrbResource {
         def result = IRBS.findAndRemove(DBQuery.is("id", id))
         if (!result) {
             throw new WebApplicationException()
+        }
+        true
+    }
+
+    @DELETE
+    @Timed
+    public static Boolean removeAll() {
+        try {
+            IRBS.find().toArray().each {
+                IRBS.findAndRemove(DBQuery.is("id", it.id))
+            }
+        } catch (MongoException e) {
+            throw new WebApplicationException(e)
         }
         true
     }

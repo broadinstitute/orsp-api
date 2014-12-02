@@ -55,16 +55,12 @@ class SampleCollectionResourceTest extends BaseAppResourceTest {
     public void cleanUp() {
         Client client = getClient()
         client.resource(
-                String.format(LOCAL_APPLICATION_URL + "/" + sample1.id, RULE.getLocalPort())).
-                accept(MediaType.APPLICATION_JSON).
-                type(MediaType.APPLICATION_JSON).
-                delete(ClientResponse.class)
-        client.resource(
-                String.format(LOCAL_APPLICATION_URL + "/" + sample2.id, RULE.getLocalPort())).
+                String.format(LOCAL_APPLICATION_URL, RULE.getLocalPort())).
                 accept(MediaType.APPLICATION_JSON).
                 type(MediaType.APPLICATION_JSON).
                 delete(ClientResponse.class)
     }
+
     @Test
     public void testUpsert() {
         Client client = getClient()
@@ -106,6 +102,41 @@ class SampleCollectionResourceTest extends BaseAppResourceTest {
                 SampleCollection.class)
         assertTrue(list.size() == 1)
         assertTrue(list.contains(sample1))
+    }
+
+    @Test
+    public void testRemoveAll() {
+        Client client = getClient()
+        ObjectMapper mapper = JsonFactory.create()
+        // Add
+        client.resource(
+                String.format(LOCAL_APPLICATION_URL, RULE.getLocalPort())).
+                accept(MediaType.APPLICATION_JSON).
+                type(MediaType.APPLICATION_JSON).
+                post(String.class, new JsonBuilder(sample1).toString())
+        // Add
+        client.resource(
+                String.format(LOCAL_APPLICATION_URL, RULE.getLocalPort())).
+                accept(MediaType.APPLICATION_JSON).
+                type(MediaType.APPLICATION_JSON).
+                post(String.class, new JsonBuilder(sample2).toString())
+        // Delete
+        client.resource(
+                String.format(LOCAL_APPLICATION_URL, RULE.getLocalPort())).
+                accept(MediaType.APPLICATION_JSON).
+                type(MediaType.APPLICATION_JSON).
+                delete(ClientResponse.class)
+        // Find all
+        def response = client.resource(
+                String.format(LOCAL_APPLICATION_URL, RULE.getLocalPort())).
+                accept(MediaType.APPLICATION_JSON).
+                type(MediaType.APPLICATION_JSON).
+                get(String.class)
+        List<SampleCollection> list = mapper.readValue(
+                response,
+                List.class,
+                SampleCollection.class)
+        assertTrue(list.isEmpty())
     }
 
     @Test

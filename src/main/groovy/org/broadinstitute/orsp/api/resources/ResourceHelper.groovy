@@ -33,6 +33,13 @@ class ResourceHelper {
         }
     }
 
+    public static Object errorIfNull(Object obj) {
+        if (obj == null) {
+            throw new WebApplicationException()
+        }
+        obj
+    }
+
     public static void errorIfNull(Object obj, Response.Status status) {
         if (obj == null) {
             throw new WebApplicationException(status)
