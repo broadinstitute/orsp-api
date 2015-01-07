@@ -9,6 +9,7 @@
  */
 package org.broadinstitute.orsp.api.domain
 
+import groovy.transform.CompileStatic
 import groovy.transform.EqualsAndHashCode
 import org.codehaus.jackson.annotate.JsonIgnoreProperties
 
@@ -23,6 +24,7 @@ import javax.validation.constraints.NotNull
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @EqualsAndHashCode(includes = ["id"])
+@CompileStatic
 class Irb {
 
     @NotNull

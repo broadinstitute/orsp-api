@@ -29,8 +29,9 @@ class MongoHealthCheck extends HealthCheck {
 
     @Override
     protected Result check() throws Exception {
-        mongo.getDatabaseNames();
-        return Result.healthy();
+        mongo.getUsedDatabases() ?
+                Result.healthy() :
+                Result.unhealthy("Unable to get mongo database names")
     }
 
 }

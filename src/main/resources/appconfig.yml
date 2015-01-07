@@ -6,6 +6,20 @@ server:
   adminConnectors:
     - type: http
       port: 8282
+  requestLog:
+    timeZone: UTC
+    appenders:
+      - type: console
+        threshold: ALL
+        timeZone: UTC
+        target: stdout
+      - type: file
+        currentLogFilename: log/http-access.log
+        threshold: ALL
+        archive: true
+        archivedLogFilenamePattern: log/http-access-%d.log
+        archivedFileCount: 50
+        timeZone: UTC
 
 mongohost: localhost
 #mongohost: orsp-api-mongo-db-rzjk

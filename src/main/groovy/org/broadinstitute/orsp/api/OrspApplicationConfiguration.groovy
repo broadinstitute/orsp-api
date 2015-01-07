@@ -10,6 +10,7 @@
 package org.broadinstitute.orsp.api
 
 import com.mongodb.Mongo
+import groovy.transform.CompileStatic
 import io.dropwizard.Configuration
 import org.codehaus.jackson.annotate.JsonProperty
 import org.hibernate.validator.constraints.NotEmpty
@@ -17,6 +18,7 @@ import org.hibernate.validator.constraints.NotEmpty
 import javax.validation.constraints.Max
 import javax.validation.constraints.Min
 
+@CompileStatic
 class OrspApplicationConfiguration extends Configuration {
 
     @JsonProperty

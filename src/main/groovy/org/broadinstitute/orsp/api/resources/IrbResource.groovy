@@ -22,7 +22,6 @@ import org.broadinstitute.orsp.api.domain.Irb
 import javax.validation.Valid
 import javax.ws.rs.*
 import javax.ws.rs.core.MediaType
-import javax.ws.rs.core.Response
 import java.util.concurrent.TimeUnit
 import java.util.regex.Pattern
 
@@ -38,7 +37,7 @@ import java.util.regex.Pattern
 @TypeChecked
 class IrbResource {
 
-    private static JacksonDBCollection<Irb, String> IRBS
+    private JacksonDBCollection<Irb, String> IRBS
 
     IrbResource(DB mongoDb) {
         IRBS = JacksonDBCollection.wrap(
@@ -48,7 +47,7 @@ class IrbResource {
 
     @Consumes(MediaType.APPLICATION_JSON)
     @POST
-    public static Object add(@Valid Irb irb) {
+    public Object add(@Valid Irb irb) {
         try {
             IRBS.findAndRemove(DBQuery.is("id", irb.id))
             return ResourceHelper.errorIfNull(IRBS.insert(irb).savedObject)
@@ -60,7 +59,7 @@ class IrbResource {
     @GET
     @Timed
     @CacheControl(maxAge = 1, maxAgeUnit = TimeUnit.MINUTES)
-    public static Collection<Irb> list() {
+    public Collection<Irb> list() {
         IRBS.find().toArray()
     }
 
@@ -68,7 +67,7 @@ class IrbResource {
     @Path('/{id}')
     @Timed
     @CacheControl(maxAge = 1, maxAgeUnit = TimeUnit.HOURS)
-    public static Irb getById(@PathParam("id") String id) {
+    public Irb getById(@PathParam("id") String id) {
         Irb irb = IRBS.findOne(DBQuery.is("id", id))
         ResourceHelper.notFoundIfNull(irb)
         irb
@@ -77,7 +76,7 @@ class IrbResource {
     @DELETE
     @Path('/{id}')
     @Timed
-    public static Boolean removeById(@PathParam("id") String id) {
+    public Boolean removeById(@PathParam("id") String id) {
         def result = IRBS.findAndRemove(DBQuery.is("id", id))
         if (!result) {
             throw new WebApplicationException()
@@ -87,7 +86,7 @@ class IrbResource {
 
     @DELETE
     @Timed
-    public static Boolean removeAll() {
+    public Boolean removeAll() {
         try {
             IRBS.find().toArray().each {
                 IRBS.findAndRemove(DBQuery.is("id", it.id))
@@ -102,7 +101,7 @@ class IrbResource {
     @Path('/find/{term}')
     @Timed
     @CacheControl(maxAge = 1, maxAgeUnit = TimeUnit.HOURS)
-    public static Collection<Irb> getCollection(@PathParam("term") String term) {
+    public Collection<Irb> getCollection(@PathParam("term") String term) {
         Pattern p = Pattern.compile(ResourceHelper.decode(term), Pattern.CASE_INSENSITIVE)
         Collection<Irb> irbs = IRBS.find(
                 DBQuery.or(

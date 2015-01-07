@@ -31,7 +31,7 @@ import java.util.regex.Pattern
 @TypeChecked
 class SampleCollectionResource {
 
-    private static JacksonDBCollection<SampleCollection, String> COLLECTIONS
+    private JacksonDBCollection<SampleCollection, String> COLLECTIONS
 
     SampleCollectionResource(DB mongoDb) {
         COLLECTIONS = JacksonDBCollection.wrap(
@@ -41,7 +41,7 @@ class SampleCollectionResource {
 
     @Consumes(MediaType.APPLICATION_JSON)
     @POST
-    public static Object add(@Valid SampleCollection collection) {
+    public Object add(@Valid SampleCollection collection) {
         try {
             COLLECTIONS.findAndRemove(DBQuery.is("id", collection.id))
             return ResourceHelper.errorIfNull(COLLECTIONS.insert(collection).savedObject)
@@ -53,7 +53,7 @@ class SampleCollectionResource {
     @GET
     @Timed
     @CacheControl(maxAge = 1, maxAgeUnit = TimeUnit.MINUTES)
-    public static Collection<SampleCollection> list() {
+    public Collection<SampleCollection> list() {
         COLLECTIONS.find().toArray()
     }
 
@@ -61,7 +61,7 @@ class SampleCollectionResource {
     @Path('/{id}')
     @Timed
     @CacheControl(maxAge = 1, maxAgeUnit = TimeUnit.HOURS)
-    public static SampleCollection getById(@PathParam("id") String id) {
+    public SampleCollection getById(@PathParam("id") String id) {
         SampleCollection collection = COLLECTIONS.findOne(DBQuery.is("id", id))
         ResourceHelper.notFoundIfNull(collection)
         collection
@@ -70,7 +70,7 @@ class SampleCollectionResource {
     @DELETE
     @Path('/{id}')
     @Timed
-    public static Boolean removeById(@PathParam("id") String id) {
+    public Boolean removeById(@PathParam("id") String id) {
         def result = COLLECTIONS.findAndRemove(DBQuery.is("id", id))
         if (!result) {
             throw new WebApplicationException()
@@ -80,7 +80,7 @@ class SampleCollectionResource {
 
     @DELETE
     @Timed
-    public static Boolean removeAll() {
+    public Boolean removeAll() {
         try {
             COLLECTIONS.find().toArray().each {
                 COLLECTIONS.findAndRemove(DBQuery.is("id", it.id))
@@ -95,7 +95,7 @@ class SampleCollectionResource {
     @Path('/find/{term}')
     @Timed
     @CacheControl(maxAge = 1, maxAgeUnit = TimeUnit.HOURS)
-    public static Collection<SampleCollection> getCollection(@PathParam("term") String term) {
+    public Collection<SampleCollection> getCollection(@PathParam("term") String term) {
         Pattern p = Pattern.compile(ResourceHelper.decode(term), Pattern.CASE_INSENSITIVE)
         Collection<SampleCollection> collections = COLLECTIONS.find(
                 DBQuery.or(
@@ -113,7 +113,7 @@ class SampleCollectionResource {
     @Path('/findAll')
     @Timed
     @CacheControl(maxAge = 1, maxAgeUnit = TimeUnit.HOURS)
-    public static Collection<SampleCollection> getCollectionsByIds(@Valid Collection<String> ids) {
+    public Collection<SampleCollection> getCollectionsByIds(@Valid Collection<String> ids) {
         Collection<SampleCollection> collections = COLLECTIONS.find(DBQuery.in("id", ids)).toArray()
         ResourceHelper.notFoundIfNull(collections.isEmpty() ? null : collections)
         collections

@@ -10,6 +10,7 @@
 package org.broadinstitute.orsp.api.resources
 
 import com.codahale.metrics.annotation.Timed
+import groovy.transform.CompileStatic
 import io.dropwizard.views.View
 import org.broadinstitute.orsp.api.views.IndexView
 
@@ -26,6 +27,7 @@ import javax.ws.rs.core.MediaType
  */
 @Path("/")
 @Produces(MediaType.TEXT_HTML)
+@CompileStatic
 class IndexResource {
 
     @GET

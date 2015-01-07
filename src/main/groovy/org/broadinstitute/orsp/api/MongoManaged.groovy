@@ -10,6 +10,7 @@
 package org.broadinstitute.orsp.api
 
 import com.mongodb.Mongo
+import groovy.transform.CompileStatic
 import io.dropwizard.lifecycle.Managed
 
 /**
@@ -18,6 +19,7 @@ import io.dropwizard.lifecycle.Managed
  *
  * @author <a href="mailto:grushton@broadinstitute.org">grushton</a>
  */
+@CompileStatic
 class MongoManaged implements Managed {
 
     private Mongo mongo

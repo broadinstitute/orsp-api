@@ -9,6 +9,7 @@
  */
 package org.broadinstitute.orsp.api.resources
 
+import groovy.transform.CompileStatic
 
 import javax.ws.rs.WebApplicationException
 import javax.ws.rs.core.Response
@@ -21,6 +22,7 @@ import org.apache.commons.lang3.CharEncoding
  *
  * @author <a href="mailto:grushton@broadinstitute.org">grushton</a>
  */
+@CompileStatic
 class ResourceHelper {
 
     public static void notFoundIfNull(Object obj) {
@@ -49,6 +51,5 @@ class ResourceHelper {
     public static String decode(String str) {
         URLDecoder.decode(str, CharEncoding.UTF_8)
     }
-
 
 }

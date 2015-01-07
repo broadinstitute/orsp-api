@@ -11,6 +11,7 @@ package org.broadinstitute.orsp.api
 
 import com.mongodb.DB
 import com.mongodb.Mongo
+import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import io.dropwizard.Application
 import io.dropwizard.setup.Bootstrap
@@ -22,6 +23,7 @@ import org.broadinstitute.orsp.api.resources.IrbResource
 import org.broadinstitute.orsp.api.resources.SampleCollectionResource
 
 @Slf4j
+@CompileStatic
 class OrspApplication extends Application<OrspApplicationConfiguration> {
 
     private final String name = 'orsp-api'
